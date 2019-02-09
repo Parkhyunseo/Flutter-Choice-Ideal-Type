@@ -52,9 +52,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: Text(widget.title),
-      ),
+      ),*/
       body: new Container(
         child: SelectPage(),
       )

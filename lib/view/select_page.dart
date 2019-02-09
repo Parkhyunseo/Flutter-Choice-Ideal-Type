@@ -18,13 +18,20 @@ class _SelectPageState extends State<SelectPage>{
           new Expanded(
             flex:1,
             child: new Card(
-              child: new Image.asset('assets/left.png'),
+              child: new Image.asset(
+                'assets/left.png',
+                fit: BoxFit.cover,
+                //height: _imageHeight,
+                ),
             ),
           ),
           new Expanded(
             flex:1,
             child: new Card(
-              child: new Image.asset('assets/right.jpg'),
+              child: new Image.asset(
+                'assets/right.jpg',
+                fit: BoxFit.cover
+                ),
             ),
           ),
         ],
