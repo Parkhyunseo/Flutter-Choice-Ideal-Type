@@ -18,11 +18,14 @@ class _SelectPageState extends State<SelectPage>{
           new Expanded(
             flex:1,
             child: new Card(
-              child: new Image.asset(
-                'assets/left.png',
-                fit: BoxFit.cover,
-                //height: _imageHeight,
+              child: GestureDetector(
+                onTap: _onTaptabbed,
+                child: new Image.asset(
+                  'assets/left.png',
+                  fit: BoxFit.cover,
+                  //height: _imageHeight,
                 ),
+              ),
             ),
           ),
           new Expanded(
@@ -52,9 +55,18 @@ class _SelectPageState extends State<SelectPage>{
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+
+    SystemChrome.setEnabledSystemUIOverlays(
+      SystemUiOverlay.values
+    );
   }
 
   void _buildCardView(){
 
+  }
+
+  void _onTaptabbed()
+  {
+    print("tap!");
   }
 }
