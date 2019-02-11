@@ -77,6 +77,12 @@ class _SelectPageState extends State<SelectPage>{
               ),
             )
           ),
+          new Container(
+              width: 5,
+              decoration: new BoxDecoration(
+                color: Colors.black
+              ),
+            ),
           new Expanded(
             flex:1,
             child: GestureDetector(
@@ -84,8 +90,6 @@ class _SelectPageState extends State<SelectPage>{
               child: new Container(
                 padding: const EdgeInsets.all(10),
                 alignment: Alignment.center,
-                //width: MediaQuery.of(context).size.width /3,
-                //height: MediaQuery.of(context).size.height,
                 child:new Card(
                   color: Colors.transparent,
                   elevation: 4.0,
