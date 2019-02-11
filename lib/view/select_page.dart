@@ -9,56 +9,133 @@ class SelectPage extends StatefulWidget{
 }
 
 class _SelectPageState extends State<SelectPage>{
-  final double _imageSize= 5000.0;
-
   @override
   Widget build(BuildContext context){
-    final double expandedSize = 180.0;
+    final double imageSize = 180.0;
+    Size screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: new Row(
         children: <Widget>[
           new Expanded(
             flex:1,
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[ 
-                new Padding(
-                  padding:EdgeInsets.all(19),
-                  child: new Text(
-                        '이름',
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis
-                  ),
-                ),
-                new Container(height: 8.0),
-                new SizedBox(
-                  width : expandedSize,
-                  height: expandedSize,
-                  child: GestureDetector(
-                    onTap: _onTaptabbed,
-                    child: new Image.asset(
-                        'assets/left.png',
-                        height: 280,
-                        fit: BoxFit.fitWidth,
+            child: GestureDetector(
+              onTap: _onTaptabbed,
+              child: new Container(
+                padding: const EdgeInsets.all(10),
+                alignment: Alignment.center,
+                //width: MediaQuery.of(context).size.width /3,
+                //height: MediaQuery.of(context).size.height,
+                child:new Card(
+                  color: Colors.transparent,
+                  elevation: 4.0,
+                  child: new Container(
+                    decoration: new BoxDecoration(
+                       color: new Color.fromRGBO(242, 194, 203, 1.0),
+                       borderRadius: new BorderRadius.circular(8.0),
                     ),
-                  ),
+                    child : new Column(
+                        children: <Widget>[
+                          new Container(
+                            width: screenSize.width,
+                            height: screenSize.height/1.25,
+                            decoration: new BoxDecoration(
+                              borderRadius: new BorderRadius.only(
+                                  topLeft: new Radius.circular(8.0),
+                                  topRight: new Radius.circular(8.0)
+                              ),
+                              image: new DecorationImage(
+                                image: new ExactAssetImage('assets/left.png'),
+                                fit: BoxFit.cover,
+                              )
+                            ),
+                          ),
+                          new Container(
+                              width: screenSize.width / 3,
+                              height: screenSize.height / 10,
+                              alignment: Alignment.center,
+                              decoration: new BoxDecoration(
+                                color: Colors.transparent
+                              ),
+                              child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget> [new Text(
+                                  "이름이름",
+                                  textAlign: TextAlign.center,
+                                  style: new TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    ),
+                                  ),  
+                                ]
+                              ),
+                            ),
+                        ],
+                    ),
+                  )
                 ),
-              ]
+              ),
             )
           ),
           new Expanded(
             flex:1,
-            child: new Card(
-              child: new Image.asset(
-                'assets/right.jpg',
-                fit: BoxFit.fill,
-                //width: _imageSize,
-                //height: _imageSize,
+            child: GestureDetector(
+              onTap: _onTaptabbed,
+              child: new Container(
+                padding: const EdgeInsets.all(10),
+                alignment: Alignment.center,
+                //width: MediaQuery.of(context).size.width /3,
+                //height: MediaQuery.of(context).size.height,
+                child:new Card(
+                  color: Colors.transparent,
+                  elevation: 4.0,
+                  child: new Container(
+                    decoration: new BoxDecoration(
+                       color: new Color.fromRGBO(242, 194, 203, 1.0),
+                       borderRadius: new BorderRadius.circular(8.0),
+                    ),
+                    child : new Column(
+                        children: <Widget>[
+                          new Container(
+                            width: screenSize.width,
+                            height: screenSize.height/1.25,
+                            decoration: new BoxDecoration(
+                              borderRadius: new BorderRadius.only(
+                                  topLeft: new Radius.circular(8.0),
+                                  topRight: new Radius.circular(8.0)
+                              ),
+                              image: new DecorationImage(
+                                image: new ExactAssetImage('assets/right.jpg'),
+                                fit: BoxFit.cover,
+                              )
+                            ),
+                          ),
+                          new Container(
+                              width: screenSize.width / 3,
+                              height: screenSize.height / 10,
+                              alignment: Alignment.center,
+                              decoration: new BoxDecoration(
+                                color: Colors.transparent
+                              ),
+                              child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget> [new Text(
+                                  "이름이름",
+                                  textAlign: TextAlign.center,
+                                  style: new TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    ),
+                                  ),  
+                                ]
+                              ),
+                            ),
+                        ],
+                    ),
+                  )
                 ),
-            ),
+              ),
+            )
           ),
         ],
       )
