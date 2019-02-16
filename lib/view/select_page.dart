@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:ideal_type/data/content.dart';
+
 class SelectPage extends StatefulWidget{
   SelectPage({Key key}) : super(key: key);
 
@@ -191,7 +193,7 @@ class _SelectPageState extends State<SelectPage>
                                       topRight: new Radius.circular(8.0)
                                   ),
                                   image: new DecorationImage(
-                                    image: new ExactAssetImage('assets/left.png'),
+                                    image: img[0],//new ExactAssetImage('assets/left.png'),
                                     fit: BoxFit.cover,
                                   )
                                 ),
@@ -260,7 +262,7 @@ class _SelectPageState extends State<SelectPage>
                                     topRight: new Radius.circular(8.0)
                                 ),
                                 image: new DecorationImage(
-                                  image: new ExactAssetImage('assets/right.jpg'),
+                                  image: img[1],//new ExactAssetImage('assets/right.jpg'),
                                   fit: BoxFit.cover,
                                 )
                               ),
