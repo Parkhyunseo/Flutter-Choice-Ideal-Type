@@ -20,10 +20,16 @@ class _SelectPageState extends State<SelectPage>
   AnimationController rightCardSelectanimationController;
   AnimationController rightCardDiscardanimationController;
 
+  AnimationController rightCardMatchanimationController;
+  AnimationController leftCardMatchanimationController;
+
   Animation<double> selectedLeftCardAnimation;
   Animation<double> selectedRightCardAnimation;
   Animation<double> discardedLeftCardAnimation;
   Animation<double> discardedRightCardAnimation;
+
+  Animation<double> matchLeftCardAnimation;
+  Animation<double> matchRightCardAnimation;
 
   _SelectAnimationStatus leftCardStatus;
   _SelectAnimationStatus rightCardStatus;
@@ -54,6 +60,20 @@ class _SelectPageState extends State<SelectPage>
     );
 
     rightCardDiscardanimationController = new AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this
+    )..addListener(
+      (){}
+    );
+
+    leftCardMatchanimationController = new AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this
+    )..addListener(
+      (){}
+    );
+
+    rightCardMatchanimationController = new AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this
     )..addListener(
@@ -128,6 +148,40 @@ class _SelectPageState extends State<SelectPage>
       });  
     });
 
+    matchLeftCardAnimation = new Tween(
+      begin: 0.0,
+      end: 500.0
+    ).animate(
+      new CurvedAnimation(
+        parent: rightCardDiscardanimationController,
+        curve:  new Interval(
+          0.0,
+          0.20,
+          curve: Curves.linear,
+        ),
+      ),
+    )..addListener(() {
+      setState((){
+      });  
+    });
+
+    matchRightCardAnimation = new Tween(
+      begin: 0.0,
+      end: 500.0
+    ).animate(
+      new CurvedAnimation(
+        parent: rightCardDiscardanimationController,
+        curve:  new Interval(
+          0.0,
+          0.20,
+          curve: Curves.linear,
+        ),
+      ),
+    )..addListener(() {
+      setState((){
+      });  
+    });
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -165,66 +219,7 @@ class _SelectPageState extends State<SelectPage>
         children: <Widget>[
           new Expanded(
             flex:1,
-            child: GestureDetector(
-              onTap: () => _selectAnimation(true),
-              child: new Transform.translate(
-                offset: Offset(leftCardStatus == _SelectAnimationStatus.select ? 
-                selectedLeftCardAnimation.value : discardedLeftCardAnimation.value,
-                 0.0),
-                child: new Container(
-                  padding: const EdgeInsets.all(10),
-                  alignment: Alignment.center,
-                  child:new Card(
-                    color: Colors.transparent,
-                    elevation: 4.0,
-                    child: new Container(
-                      decoration: new BoxDecoration(
-                        color: new Color.fromRGBO(242, 194, 203, 1.0),
-                        borderRadius: new BorderRadius.circular(8.0),
-                      ),
-                      child : new Column(
-                          children: <Widget>[
-                              new Container(
-                                width: screenSize.width,
-                                height: screenSize.height/1.25,
-                                decoration: new BoxDecoration(
-                                  borderRadius: new BorderRadius.only(
-                                      topLeft: new Radius.circular(8.0),
-                                      topRight: new Radius.circular(8.0)
-                                  ),
-                                  image: new DecorationImage(
-                                    image: img[0],//new ExactAssetImage('assets/left.png'),
-                                    fit: BoxFit.cover,
-                                  )
-                                ),
-                              ),
-                            new Container(
-                                width: screenSize.width / 3,
-                                height: screenSize.height / 10,
-                                alignment: Alignment.center,
-                                decoration: new BoxDecoration(
-                                  color: Colors.transparent
-                                ),
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: <Widget> [new Text(
-                                    "이름이름",
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      ),
-                                    ),  
-                                  ]
-                                ),
-                              ),
-                          ],
-                      ),
-                    )
-                  ),
-                ),
-              ) 
-            )
+            child: _buildCardView(true, screenSize, 0)
           ),
           new Container(
               width: 5,
@@ -234,66 +229,7 @@ class _SelectPageState extends State<SelectPage>
             ),
           new Expanded(
             flex:1,
-            child: GestureDetector(
-              onTap: () => _selectAnimation(false),
-              child: new Transform.translate(
-                offset: Offset(rightCardStatus == _SelectAnimationStatus.select ? 
-                selectedRightCardAnimation.value : discardedRightCardAnimation.value,
-                 0.0),
-                child: new Container(
-                  padding: const EdgeInsets.all(10),
-                  alignment: Alignment.center,
-                  child:new Card(
-                    color: Colors.transparent,
-                    elevation: 4.0,
-                    child: new Container(
-                      decoration: new BoxDecoration(
-                        color: new Color.fromRGBO(242, 194, 203, 1.0),
-                        borderRadius: new BorderRadius.circular(8.0),
-                      ),
-                      child : new Column(
-                          children: <Widget>[
-                            new Container(
-                              width: screenSize.width,
-                              height: screenSize.height/1.25,
-                              decoration: new BoxDecoration(
-                                borderRadius: new BorderRadius.only(
-                                    topLeft: new Radius.circular(8.0),
-                                    topRight: new Radius.circular(8.0)
-                                ),
-                                image: new DecorationImage(
-                                  image: img[1],//new ExactAssetImage('assets/right.jpg'),
-                                  fit: BoxFit.cover,
-                                )
-                              ),
-                            ),
-                            new Container(
-                                width: screenSize.width / 3,
-                                height: screenSize.height / 10,
-                                alignment: Alignment.center,
-                                decoration: new BoxDecoration(
-                                  color: Colors.transparent
-                                ),
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: <Widget> [new Text(
-                                    "이름이름",
-                                    textAlign: TextAlign.center,
-                                    style: new TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      ),
-                                    ),  
-                                  ]
-                                ),
-                              ),
-                          ],
-                      ),
-                    )
-                  ),
-                ),
-              ),
-            )
+            child: _buildCardView(false, screenSize, 1)
           ),
         ],
       )
@@ -309,7 +245,74 @@ class _SelectPageState extends State<SelectPage>
     super.dispose();
   }
 
-  void _buildCardView(){
+  Widget _buildCardView(bool isLeft, Size screenSize, int index){
+    Offset offset;
+    if(isLeft)
+      offset = Offset(leftCardStatus == _SelectAnimationStatus.select ? 
+                selectedLeftCardAnimation.value : discardedLeftCardAnimation.value,
+                 0.0);
+    else
+      offset = Offset(rightCardStatus == _SelectAnimationStatus.select ? 
+                selectedRightCardAnimation.value : discardedRightCardAnimation.value, 0.0);
 
+    return GestureDetector(
+      onTap: () => _selectAnimation(isLeft),
+      child: new Transform.translate(
+        offset: offset,
+        child: new Container(
+          padding: const EdgeInsets.all(10),
+          alignment: Alignment.center,
+          child:new Card(
+            color: Colors.transparent,
+            elevation: 4.0,
+            child: new Container(
+              decoration: new BoxDecoration(
+                color: new Color.fromRGBO(242, 194, 203, 1.0),
+                borderRadius: new BorderRadius.circular(8.0),
+              ),
+              child : new Column(
+                children: <Widget>[
+                  new Container(
+                    width: screenSize.width,
+                    height: screenSize.height/1.25,
+                    decoration: new BoxDecoration(
+                      borderRadius: new BorderRadius.only(
+                        topLeft: new Radius.circular(8.0),
+                        topRight: new Radius.circular(8.0)
+                      ),
+                      image: new DecorationImage(
+                        image: img[index],//new ExactAssetImage('assets/left.png'),
+                        fit: BoxFit.cover,
+                      )
+                    ),
+                  ),
+                  new Container(
+                    width: screenSize.width / 3,
+                    height: screenSize.height / 10,
+                    alignment: Alignment.center,
+                    decoration: new BoxDecoration(
+                      color: Colors.transparent
+                    ),
+                    child: new Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget> [
+                        new Text(
+                          "이름이름",
+                          textAlign: TextAlign.center,
+                          style: new TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),  
+                      ]
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ),
+        ),
+      ) 
+    );
   }
 }
