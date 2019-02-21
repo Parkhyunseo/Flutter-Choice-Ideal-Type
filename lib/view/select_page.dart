@@ -35,11 +35,13 @@ class _SelectPageState extends State<SelectPage>
   Animation<double> matchLeftCardAnimation;
   Animation<double> matchRightCardAnimation;
 
-  Tween leftCardCenterToLeft;
-  Tween leftCardToLeft;
+  Tween<double> leftCardCenterToLeft;
+  Tween<double> leftCardToLeft;
 
-  Tween rightCardCenterToLeft;
-  Tween rightCardLeft;
+  Tween<double> rightCardCenterToRight;
+  Tween<double> rightCardToRight;
+
+  Function listener;
 
   _SelectAnimationStatus leftCardStatus;
   _SelectAnimationStatus rightCardStatus;
@@ -59,7 +61,7 @@ class _SelectPageState extends State<SelectPage>
     );
 
     leftCardDiscardanimationController = new AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 500),
       vsync: this
     )..addListener(
       (){}
@@ -73,7 +75,7 @@ class _SelectPageState extends State<SelectPage>
     );
 
     rightCardDiscardanimationController = new AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 500),
       vsync: this
     )..addListener(
       (){}
@@ -92,6 +94,12 @@ class _SelectPageState extends State<SelectPage>
     )..addListener(
       (){}
     );
+
+    leftCardToLeft = new Tween(begin: 0.0, end: -500.0);
+    leftCardCenterToLeft = new Tween(begin: 150.0, end: -500.0);
+
+    rightCardToRight = new Tween(begin: 0.0, end: 500.0);
+    rightCardCenterToRight = new Tween(begin: -150.0, end:500.0);
 
     selectedLeftCardAnimation = new Tween(
       begin: 0.0, 
@@ -119,10 +127,7 @@ class _SelectPageState extends State<SelectPage>
       });  
     });    
    
-    discardedLeftCardAnimation = new Tween(
-      begin: 0.0 ,
-      end: -500.0
-    ).animate(
+    discardedLeftCardAnimation = leftCardToLeft.animate(
       new CurvedAnimation(
         parent: leftCardDiscardanimationController,
         curve:  new Interval(
@@ -136,10 +141,7 @@ class _SelectPageState extends State<SelectPage>
       });  
     });
 
-    discardedRightCardAnimation = new Tween(
-      begin: 0.0,
-      end: 500.0
-    ).animate(
+    discardedRightCardAnimation = rightCardToRight.animate(
       new CurvedAnimation(
         parent: rightCardDiscardanimationController,
         curve:  new Interval(
@@ -187,9 +189,6 @@ class _SelectPageState extends State<SelectPage>
       });  
     });
 
-    leftCardToLeft = new Tween(begin: 0.0, end: -500.0);
-    leftCardCenterToLeft = new Tween(begin: 150.0, end: -500.0);
-
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -200,6 +199,19 @@ class _SelectPageState extends State<SelectPage>
     );
 
     _next();
+  }
+
+  void _startMatch() {
+    _reset();
+
+    if(img.length <= 0)
+      _next();
+
+    leftCardStatus = _SelectAnimationStatus.start;
+    rightCardStatus = _SelectAnimationStatus.start;
+
+    leftCardMatchanimationController.forward();
+    rightCardMatchanimationController.forward();
   }
 
   void _reset() {
@@ -252,14 +264,6 @@ class _SelectPageState extends State<SelectPage>
     //..addListener(() => setState((){}));
   }
 
-  void _onDiscardRightComplete(ExactAssetImage selectImage){
-    _prepareNext(selectImage);
-
-    discardedRightCardAnimation = rightCardCenterToLeft
-    .animate(rightCardDiscardanimationController);
-    //..addListener(() => setState((){}));
-  }
-
   void _selectLeftAnimation(ExactAssetImage selectImage){
     select = true;
 
@@ -272,138 +276,75 @@ class _SelectPageState extends State<SelectPage>
 
   void _discardLeftAfterSelectAnimation(ExactAssetImage selectImage){
     leftCardStatus = _SelectAnimationStatus.discard;
+    
+    void _onStatusChange(AnimationStatus status){
+      if(status == AnimationStatus.completed)
+      {
+        _onDiscardLeftComplete(selectImage);
+        discardedLeftCardAnimation.removeStatusListener(_onStatusChange);
+      }
+    }
+
     discardedLeftCardAnimation = leftCardCenterToLeft
     .animate(leftCardDiscardanimationController)
-    ..addStatusListener((AnimationStatus status){
-      if(status == AnimationStatus.completed)
-        _onDiscardLeftComplete(selectImage);
-    });
+    ..removeStatusListener(listener)
+    ..addStatusListener(_onStatusChange);
     leftCardDiscardanimationController.forward();
   }
 
-  void _selectRightAnimation(ExactAssetImage selectImage){
+  void _onTapRightCard(ExactAssetImage selectImage){
     if(rightCardDiscardanimationController.isAnimating)
       return;
-
+    
+    if(rightCardMatchanimationController.isAnimating)
+      return;
+    
     if(rightCardSelectanimationController.isAnimating)
       return;
 
-    if(rightCardMatchanimationController.isAnimating)
-      return;
-
-    if(select){
-        rightCardStatus = _SelectAnimationStatus.discard;
-        discardedLeftCardAnimation = 
-          new Tween(
-              begin: 150.0,
-              end: -500.0
-            ).animate(
-              new CurvedAnimation(
-                parent: rightCardDiscardanimationController,
-                curve: Curves.linear
-              ),
-            )..addListener(() {
-              setState((){
-              });  
-            })..addStatusListener((AnimationStatus status){
-              if(status == AnimationStatus.completed){
-                select = false;
-                img.removeAt(0);
-                img.removeAt(0);
-
-                temp.add(selectImage);
-                discardedLeftCardAnimation = new Tween(
-                    begin: 0.0,
-                    end: -500.0
-                  ).animate(
-                    new CurvedAnimation(
-                      parent: rightCardDiscardanimationController,
-                      curve:  new Interval(
-                        0.0,
-                        0.20,
-                        curve: Curves.linear,
-                      ),
-                    ),
-                  )..addListener(() {
-                    setState((){
-                    });  
-                  });
-                var a= new Tween(begin: 0.0, end:500.0);
-                a.begin
-                leftCardStatus = _SelectAnimationStatus.stay;
-                _startMatch();
-              }
-          });
-        leftCardDiscardanimationController.forward();
-      }else{
-        select = true;
-
-        leftCardStatus = _SelectAnimationStatus.select;
-        rightCardStatus = _SelectAnimationStatus.discard;
-        
-        leftCardSelectanimationController.forward();
-        rightCardDiscardanimationController.forward();
-      }
+    if(select)
+      _discardRightAfterSelectAnimation(selectImage);  
+    else
+      _selectRightAnimation(selectImage);
   }
 
-  void _selectAnimation(bool isLeft, ExactAssetImage selectImage){
-    if(isLeft){
-      
-    }else{
-      if(select){
+  void _onDiscardRightComplete(ExactAssetImage selectImage){
+    _prepareNext(selectImage);
+
+    discardedRightCardAnimation = rightCardToRight
+    .animate(rightCardDiscardanimationController);
+  }
+
+  void _selectRightAnimation(ExactAssetImage selectImage){
+    select = true;
+
+    leftCardStatus = _SelectAnimationStatus.discard;
+    rightCardStatus = _SelectAnimationStatus.select;
         
-        discardedRightCardAnimation = 
-          new Tween(
-              begin: -150.0,
-              end: 500.0
-            ).animate(
-              new CurvedAnimation(
-                parent: rightCardDiscardanimationController,
-                curve: Curves.linear,
-              ),
-            )..addListener(() {
-              setState((){
-              });  
-            })..addStatusListener((AnimationStatus status){
-              if(status == AnimationStatus.completed){
-                select = false;
-                img.removeAt(0);
-                img.removeAt(0);
-                
-                temp.add(selectImage);
-                discardedRightCardAnimation = new Tween(
-                  begin: 0.0,
-                  end: 500.0
-                ).animate(
-                  new CurvedAnimation(
-                    parent: rightCardDiscardanimationController,
-                    curve:  new Interval(
-                      0.0,
-                      0.20,
-                      curve: Curves.linear,
-                    ),
-                  ),
-                )..addListener(() {
-                  setState((){
-                  });  
-                });
-                rightCardStatus = _SelectAnimationStatus.stay;
-                _startMatch();
-              }        
-            });
-        rightCardDiscardanimationController.forward();
-      }else{
-        select = true;
-        leftCardStatus = _SelectAnimationStatus.discard;
-        rightCardStatus = _SelectAnimationStatus.select;
-        rightCardSelectanimationController.forward();
-        leftCardDiscardanimationController.forward();
+    rightCardSelectanimationController.forward();
+    leftCardDiscardanimationController.forward();
+  }
+
+  void _discardRightAfterSelectAnimation(ExactAssetImage selectImage){
+    rightCardStatus = _SelectAnimationStatus.discard;
+    
+    void _onStatusChange(AnimationStatus status){
+      if(status == AnimationStatus.completed)
+      {
+        _onDiscardRightComplete(selectImage);
+        discardedRightCardAnimation.removeStatusListener(_onStatusChange);
       }
     }
-  }
 
+    discardedRightCardAnimation = rightCardCenterToRight
+    .animate(rightCardDiscardanimationController)
+    ..addStatusListener(_onStatusChange);
+    rightCardDiscardanimationController.forward();
+  }
+  
   double _getOffsetValue(bool isLeft){
     var status = isLeft ? leftCardStatus : rightCardStatus;
+
     double value = 0.0;
 
     switch(status){
@@ -425,12 +366,12 @@ class _SelectPageState extends State<SelectPage>
     return value;
   }
 
-  Widget _buildCardView(bool isLeft, Size screenSize, int index){
-    
+  Widget _buildCardView(bool isLeft, Size screenSize){
     Offset offset = Offset(_getOffsetValue(isLeft), 0.0);
+    var index = isLeft ? 0 : 1;
 
     return GestureDetector(
-      onTap: () => _selectAnimation(isLeft, img[index]),
+      onTap: () => isLeft ? _onTapLeftCard(img[index]) : _onTapRightCard(img[index]),
       child: new Transform.translate(
         offset: offset,
         child: new Container(
@@ -489,33 +430,6 @@ class _SelectPageState extends State<SelectPage>
       ) 
     );
   }
-
-  @override
-  Widget build(BuildContext context){
-    //final double percent = (_animationController.value * 100.0);
-    Size screenSize = MediaQuery.of(context).size;
-
-    return Scaffold(
-      body: new Row(
-        children: <Widget>[
-          new Expanded(
-            flex:1,
-            child: _buildCardView(true, screenSize, 0)
-          ),
-          new Container(
-            width: 5,
-              // decoration: new BoxDecoration(
-              //   color: Colors.black
-              // ),
-            ),
-          new Expanded(
-            flex:1,
-            child: _buildCardView(false, screenSize, 1)
-          ),
-        ],
-      )
-    );
-  }
   
   @override
   void dispose() {
@@ -528,16 +442,27 @@ class _SelectPageState extends State<SelectPage>
     super.dispose();
   }
 
-  void _startMatch() {
-    _reset();
+  @override
+  Widget build(BuildContext context){
+    //final double percent = (_animationController.value * 100.0);
+    Size screenSize = MediaQuery.of(context).size;
 
-    if(img.length <= 0)
-      _next();
-
-    leftCardStatus = _SelectAnimationStatus.start;
-    rightCardStatus = _SelectAnimationStatus.start;
-
-    leftCardMatchanimationController.forward();
-    rightCardMatchanimationController.forward();
-  }
+    return Scaffold(
+      body: new Row(
+        children: <Widget>[
+          new Expanded(
+            flex:1,
+            child: _buildCardView(true, screenSize)
+          ),
+          new Container(
+            width: 5,
+          ),
+          new Expanded(
+            flex:1,
+            child: _buildCardView(false, screenSize)
+          ),
+        ],
+      )
+    );
+  }  
 }
