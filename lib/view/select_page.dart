@@ -23,6 +23,8 @@ class _SelectPageState extends State<SelectPage>
   AnimationController rightCardDiscardanimationController;
   AnimationController rightCardMatchanimationController;
 
+  //AnimationController textShowAnimationController;
+
   Animation<double> selectedLeftCardAnimation;
   Animation<double> selectedRightCardAnimation;
 
@@ -46,7 +48,9 @@ class _SelectPageState extends State<SelectPage>
   _SelectAnimationStatus leftCardStatus;
   _SelectAnimationStatus rightCardStatus;
 
-  List temp = [];
+  List<Content> temp = [];
+
+  bool end = false;
   bool select = false;
 
   @override
@@ -231,16 +235,16 @@ class _SelectPageState extends State<SelectPage>
     _startMatch();
   }
 
-  void _prepareNext(ExactAssetImage selectImage){
+  void _prepareNext(Content selectContent){
     select = false;
     img.removeAt(0);
     img.removeAt(0);
 
-    temp.add(selectImage);
+    temp.add(selectContent);
     _startMatch();
   }
 
-  void _onTapLeftCard(ExactAssetImage selectImage){
+  void _onTapLeftCard(Content selectContent){
     if(leftCardDiscardanimationController.isAnimating)
       return;
     
@@ -251,20 +255,20 @@ class _SelectPageState extends State<SelectPage>
       return;
 
     if(select)
-      _discardLeftAfterSelectAnimation(selectImage);  
+      _discardLeftAfterSelectAnimation(selectContent);  
     else
-      _selectLeftAnimation(selectImage);
+      _selectLeftAnimation();
   }
 
-  void _onDiscardLeftComplete(ExactAssetImage selectImage){
-    _prepareNext(selectImage);
+  void _onDiscardLeftComplete(Content selectContent){
+    _prepareNext(selectContent);
 
     discardedLeftCardAnimation = leftCardToLeft
     .animate(leftCardDiscardanimationController);
     //..addListener(() => setState((){}));
   }
 
-  void _selectLeftAnimation(ExactAssetImage selectImage){
+  void _selectLeftAnimation(){
     select = true;
 
     leftCardStatus = _SelectAnimationStatus.select;
@@ -274,13 +278,13 @@ class _SelectPageState extends State<SelectPage>
     rightCardDiscardanimationController.forward();
   }
 
-  void _discardLeftAfterSelectAnimation(ExactAssetImage selectImage){
+  void _discardLeftAfterSelectAnimation(Content selectContent){
     leftCardStatus = _SelectAnimationStatus.discard;
     
     void _onStatusChange(AnimationStatus status){
       if(status == AnimationStatus.completed)
       {
-        _onDiscardLeftComplete(selectImage);
+        _onDiscardLeftComplete(selectContent);
         discardedLeftCardAnimation.removeStatusListener(_onStatusChange);
       }
     }
@@ -292,7 +296,7 @@ class _SelectPageState extends State<SelectPage>
     leftCardDiscardanimationController.forward();
   }
 
-  void _onTapRightCard(ExactAssetImage selectImage){
+  void _onTapRightCard(Content selectContent){
     if(rightCardDiscardanimationController.isAnimating)
       return;
     
@@ -303,19 +307,19 @@ class _SelectPageState extends State<SelectPage>
       return;
 
     if(select)
-      _discardRightAfterSelectAnimation(selectImage);  
+      _discardRightAfterSelectAnimation(selectContent);  
     else
-      _selectRightAnimation(selectImage);
+      _selectRightAnimation();
   }
 
-  void _onDiscardRightComplete(ExactAssetImage selectImage){
-    _prepareNext(selectImage);
+  void _onDiscardRightComplete(Content selectContent){
+    _prepareNext(selectContent);
 
     discardedRightCardAnimation = rightCardToRight
     .animate(rightCardDiscardanimationController);
   }
 
-  void _selectRightAnimation(ExactAssetImage selectImage){
+  void _selectRightAnimation(){
     select = true;
 
     leftCardStatus = _SelectAnimationStatus.discard;
@@ -325,13 +329,13 @@ class _SelectPageState extends State<SelectPage>
     leftCardDiscardanimationController.forward();
   }
 
-  void _discardRightAfterSelectAnimation(ExactAssetImage selectImage){
+  void _discardRightAfterSelectAnimation(Content selectContent){
     rightCardStatus = _SelectAnimationStatus.discard;
     
     void _onStatusChange(AnimationStatus status){
       if(status == AnimationStatus.completed)
       {
-        _onDiscardRightComplete(selectImage);
+        _onDiscardRightComplete(selectContent);
         discardedRightCardAnimation.removeStatusListener(_onStatusChange);
       }
     }
@@ -396,7 +400,7 @@ class _SelectPageState extends State<SelectPage>
                         topRight: new Radius.circular(8.0)
                       ),
                       image: new DecorationImage(
-                        image: img[index],//new ExactAssetImage('assets/left.png'),
+                        image: img[index].image,//new ExactAssetImage('assets/left.png'),
                         fit: BoxFit.cover,
                       )
                     ),
@@ -412,7 +416,7 @@ class _SelectPageState extends State<SelectPage>
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget> [
                         new Text(
-                          "이름이름",
+                          img[index].name,
                           textAlign: TextAlign.center,
                           style: new TextStyle(
                             color: Colors.white,
