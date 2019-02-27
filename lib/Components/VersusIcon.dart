@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 
-class VersusIcon extends StatelessWidget{  
+class VersusIcon extends StatefulWidget {
+  final Function callback;
+
+  VersusIcon(this.callback);
+
+  @override
+  State<StatefulWidget> createState() => _VersusIconState();
+}
+
+class _VersusIconState extends State<VersusIcon>
+  with TickerProviderStateMixin{  
+  
+  bool _animatingReveal = false;
+  
   @override
   Widget build(BuildContext context) {
     return (new Container(
@@ -27,5 +40,15 @@ class VersusIcon extends StatelessWidget{
         )
       )
     ));
+  }
+
+  void _animateRevealing(){
+    _animatingReveal = true;
+    widget.callback();
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
   }
 }
