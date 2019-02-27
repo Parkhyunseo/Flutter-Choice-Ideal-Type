@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'package:ideal_type/data/content.dart';
 
+import 'package:ideal_type/Components/VersusIcon.dart';
+
 class SelectPage extends StatefulWidget{
   SelectPage({Key key}) : super(key: key);
 
@@ -23,7 +25,7 @@ class _SelectPageState extends State<SelectPage>
   AnimationController rightCardDiscardanimationController;
   AnimationController rightCardMatchanimationController;
 
-  //AnimationController textShowAnimationController;
+  AnimationController textShowAnimationController;
 
   Animation<double> selectedLeftCardAnimation;
   Animation<double> selectedRightCardAnimation;
@@ -37,6 +39,10 @@ class _SelectPageState extends State<SelectPage>
   Animation<double> matchLeftCardAnimation;
   Animation<double> matchRightCardAnimation;
 
+  Animation<Color> textFadeInAnimation;
+  Animation<double> textScaleUpAnimation;
+  Animation<Color> textFadeOutAnimation;
+
   Tween<double> leftCardCenterToLeft;
   Tween<double> leftCardToLeft;
 
@@ -49,7 +55,8 @@ class _SelectPageState extends State<SelectPage>
   _SelectAnimationStatus rightCardStatus;
 
   List<Content> temp = [];
-
+  String message = '';
+  
   bool end = false;
   bool select = false;
 
@@ -80,6 +87,13 @@ class _SelectPageState extends State<SelectPage>
 
     rightCardDiscardanimationController = new AnimationController(
       duration: const Duration(milliseconds: 500),
+      vsync: this
+    )..addListener(
+      (){}
+    );
+
+    textShowAnimationController = new AnimationController(
+      duration: const Duration(milliseconds: 5000),
       vsync: this
     )..addListener(
       (){}
@@ -193,6 +207,49 @@ class _SelectPageState extends State<SelectPage>
       });  
     });
 
+    textScaleUpAnimation = new Tween(
+      begin: 1.0,
+      end: 1.5
+    ).animate(
+      new CurvedAnimation(
+        parent: textShowAnimationController,
+        curve:  new Interval(
+          0.0,
+          0.70,
+          curve: Curves.bounceInOut,
+        ),
+      ),
+    )..addListener(() {
+      setState((){
+      });  
+    });
+
+    textFadeOutAnimation = new Tween(
+      begin: Color.fromARGB(255, 0, 0, 0),
+      end: Color.fromARGB(0, 0, 0, 0),
+    ).animate(
+      new CurvedAnimation(
+        parent: textShowAnimationController,
+        curve:  new Interval(
+          0.70,
+          1.00,
+          curve: Curves.linear,
+        ),
+      ),
+    )..addListener(() {
+      setState((){
+      });  
+    })..addStatusListener((AnimationStatus status){
+      if(status == AnimationStatus.completed)
+      {
+        setState((){
+          message = '';
+        });
+        
+        _startMatch();
+      }
+    });
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -210,12 +267,14 @@ class _SelectPageState extends State<SelectPage>
 
     if(img.length <= 0)
       _next();
+    else
+    {
+      leftCardStatus = _SelectAnimationStatus.start;
+      rightCardStatus = _SelectAnimationStatus.start;
 
-    leftCardStatus = _SelectAnimationStatus.start;
-    rightCardStatus = _SelectAnimationStatus.start;
-
-    leftCardMatchanimationController.forward();
-    rightCardMatchanimationController.forward();
+      leftCardMatchanimationController.forward();
+      rightCardMatchanimationController.forward();
+    }
   }
 
   void _reset() {
@@ -228,11 +287,20 @@ class _SelectPageState extends State<SelectPage>
     rightCardMatchanimationController.reset();
   }
   
-  void _next() {    
+  void _next() {   
     if(temp.length != 0)
-      img = temp;  
+    {
+      img = temp.map((element)=>element).toList(); // Copy
+      temp.clear();
+    }
+          
     img.shuffle();
-    _startMatch();
+
+    setState((){
+      message = img.length.toString() + ' 강';  
+    });
+
+    textShowAnimationController.forward();
   }
 
   void _prepareNext(Content selectContent){
@@ -370,6 +438,33 @@ class _SelectPageState extends State<SelectPage>
     return value;
   }
 
+  Widget _buildMessageBoard(){
+    if(message == '')
+      return new Container();
+
+    var scale = textScaleUpAnimation.value;
+    var color = textFadeOutAnimation.value;
+
+    return new Center(
+      child: new Container(
+        alignment: Alignment.center,
+        width: MediaQuery.of(context).size.width/2,
+        height: MediaQuery.of(context).size.height/2.5,
+        child: new Transform.scale(
+          scale : scale,
+          child: new Text(
+            message,
+            textAlign: TextAlign.center,
+              style: new TextStyle(
+              color: color,
+              fontSize: 18,
+            )
+          )
+        )   
+      )
+    );
+  }
+
   Widget _buildCardView(bool isLeft, Size screenSize){
     Offset offset = Offset(_getOffsetValue(isLeft), 0.0);
     var index = isLeft ? 0 : 1;
@@ -452,20 +547,28 @@ class _SelectPageState extends State<SelectPage>
     Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: new Row(
+      body: new Stack(
         children: <Widget>[
-          new Expanded(
-            flex:1,
-            child: _buildCardView(true, screenSize)
+          new Row(
+            children: <Widget>[
+              new Expanded(
+                flex:1,
+                child: _buildCardView(true, screenSize)
+              ),
+              new Container(
+                width: 5,
+              ),
+              new Expanded(
+                flex:1,
+                child: _buildCardView(false, screenSize)
+              ),
+            ],
           ),
           new Container(
-            width: 5,
-          ),
-          new Expanded(
-            flex:1,
-            child: _buildCardView(false, screenSize)
-          ),
-        ],
+            alignment: Alignment.center,
+            child: new VersusIcon()
+          )
+        ]
       )
     );
   }  
